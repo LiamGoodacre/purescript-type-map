@@ -280,27 +280,22 @@ checkLookup _ _ = Proxy
 
 
 lookupEmpty :: Proxy None
-lookupEmpty = checkLookup (Proxy :: Proxy EmptyMap)
-                          (SProxy :: SProxy "A")
+lookupEmpty = checkLookup (Proxy :: Proxy EmptyMap) _A
 
 lookupSingletonNotPresent :: Proxy None
-lookupSingletonNotPresent = checkLookup (Proxy :: Proxy (SingletonMap "A" A))
-                                        (SProxy :: SProxy "B")
+lookupSingletonNotPresent = checkLookup (Proxy :: Proxy (SingletonMap "A" A)) _B
 
 lookupSingletonPresent :: Proxy (Some A)
-lookupSingletonPresent = checkLookup (Proxy :: Proxy (SingletonMap "A" A))
-                                     (SProxy :: SProxy "A")
+lookupSingletonPresent = checkLookup (Proxy :: Proxy (SingletonMap "A" A)) _A
 
 
 lookupMultipleA :: Proxy (Some A)
 lookupMultipleA =
-  checkLookup (Proxy :: Proxy (MapThree MapLeaf "A" A MapLeaf "B" B MapLeaf))
-              (SProxy :: SProxy "A")
+  checkLookup (Proxy :: Proxy (MapThree MapLeaf "A" A MapLeaf "B" B MapLeaf)) _A
 
 lookupMultipleB :: Proxy (Some B)
 lookupMultipleB =
-  checkLookup (Proxy :: Proxy (MapThree MapLeaf "B" B MapLeaf "A" A MapLeaf))
-              (SProxy :: SProxy "B")
+  checkLookup (Proxy :: Proxy (MapThree MapLeaf "B" B MapLeaf "A" A MapLeaf)) _B
 
 
 checkValidInsert :: forall before after key value result.
