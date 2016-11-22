@@ -68,27 +68,28 @@ instance listLengthCons
   :: ListLength tail length
   => ListLength (Cons head tail) (Succ length)
 
-class ListConsWhenNot cond head tail result | cond -> head tail result
+class ListConsWhenNot cond head tail result | cond head tail -> result
 instance listConsWhenNotYes
   :: ListConsWhenNot Yes head tail tail
 instance listConsWhenNotNo
   :: ListConsWhenNot No head tail (Cons head tail)
 
-class ListRejectNatEq list nat result | list -> nat result
+class ListRejectNatEq list nat result | list nat -> result
 instance listRejectNatEqNil
   :: ListRejectNatEq Nil nat Nil
 instance listRejectNatEqCons
-  :: (NatEq nat head isEq,
-      ListConsWhenNot isEq head tail list)
-  => ListRejectNatEq (Cons head tail) nat list
+  :: (NatEq head nat isEq,
+      ListRejectNatEq tail nat list,
+      ListConsWhenNot isEq head list result)
+  => ListRejectNatEq (Cons head tail) nat result
 
 class NatListNub list result | list -> result
 instance natListNubNil
   :: NatListNub Nil Nil
 instance natListNubCons
-  :: (ListRejectNatEq tail head filtered,
+  :: (ListRejectNatEq tail nat filtered,
       NatListNub filtered list)
-  => NatListNub (Cons head tail) (Cons head list)
+  => NatListNub (Cons nat tail) (Cons nat list)
 
 
 -- implementation
@@ -239,6 +240,22 @@ instance mapInsertLeaf
 --TODO
 
 
+
+-- play area
+
+_A :: SProxy "A"
+_A = SProxy
+
+_B :: SProxy "B"
+_B = SProxy
+
+_C :: SProxy "C"
+_C = SProxy
+
+data A
+data B
+data C
+
 checkValidMap :: forall map result. IsMapValid map result => Proxy map -> Proxy result
 checkValidMap Proxy = Proxy
 
@@ -246,7 +263,13 @@ validEmptyMap :: Proxy Yes
 validEmptyMap = checkValidMap (Proxy :: Proxy EmptyMap)
 
 validSingletonMap :: Proxy Yes
-validSingletonMap = checkValidMap (Proxy :: Proxy (SingletonMap "A" Int))
+validSingletonMap = checkValidMap (Proxy :: Proxy (SingletonMap "A" A))
+
+validTwoMap :: Proxy Yes
+validTwoMap = checkValidMap (Proxy :: Proxy (MapTwo MapLeaf "A" A MapLeaf))
+
+validThreeMap :: Proxy Yes
+validThreeMap = checkValidMap (Proxy :: Proxy (MapThree MapLeaf "A" A MapLeaf "B" B MapLeaf))
 
 
 checkLookup :: forall map key value.
@@ -261,12 +284,23 @@ lookupEmpty = checkLookup (Proxy :: Proxy EmptyMap)
                           (SProxy :: SProxy "A")
 
 lookupSingletonNotPresent :: Proxy None
-lookupSingletonNotPresent = checkLookup (Proxy :: Proxy (SingletonMap "A" Int))
+lookupSingletonNotPresent = checkLookup (Proxy :: Proxy (SingletonMap "A" A))
                                         (SProxy :: SProxy "B")
 
-lookupSingletonPresent :: Proxy (Some Int)
-lookupSingletonPresent = checkLookup (Proxy :: Proxy (SingletonMap "A" Int))
+lookupSingletonPresent :: Proxy (Some A)
+lookupSingletonPresent = checkLookup (Proxy :: Proxy (SingletonMap "A" A))
                                      (SProxy :: SProxy "A")
+
+
+lookupMultipleA :: Proxy (Some A)
+lookupMultipleA =
+  checkLookup (Proxy :: Proxy (MapThree MapLeaf "A" A MapLeaf "B" B MapLeaf))
+              (SProxy :: SProxy "A")
+
+lookupMultipleB :: Proxy (Some B)
+lookupMultipleB =
+  checkLookup (Proxy :: Proxy (MapThree MapLeaf "B" B MapLeaf "A" A MapLeaf))
+              (SProxy :: SProxy "B")
 
 
 checkValidInsert :: forall before after key value result.
@@ -279,6 +313,6 @@ checkValidInsert _ _ _ = Proxy
 validInsert :: Proxy Yes
 validInsert = checkValidInsert (Proxy :: Proxy EmptyMap)
                                (SProxy :: SProxy "A")
-                               (Proxy :: Proxy Int)
+                               (Proxy :: Proxy A)
 
 
