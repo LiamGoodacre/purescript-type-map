@@ -10,7 +10,8 @@
     "purescript-maybe": "^2.0.1",
     "purescript-console": "^2.0.0",
     "purescript-symbols": "^2.0.0",
-    "purescript-proxy": "^1.0.0"
+    "purescript-proxy": "^1.0.0",
+    "purescript-typelevel-prelude": "^1.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^2.0.0"
