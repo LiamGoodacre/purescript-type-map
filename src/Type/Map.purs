@@ -269,7 +269,7 @@ class FromZipperCons_ (head :: *)
                       (ctx :: *)
                       (map :: *)
                       (result :: *)
-                      | head -> result
+                      | head -> ctx map result
 instance fromZipperConsTwoLeft
   :: FromZipper_ ctx (MapTwo map k1 v1 r) result
   => FromZipperCons_ (CtxTwoLeft k1 v1 r) ctx map result
