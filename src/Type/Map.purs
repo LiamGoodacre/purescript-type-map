@@ -29,11 +29,11 @@ foreign import data Zero :: Nat
 foreign import data Succ :: Nat -> Nat
 -}
 
-foreign import data Zero :: *
-foreign import data Succ :: * -> *
+foreign import data Zero :: Type
+foreign import data Succ :: Type -> Type
 
-class NatEq (left :: *)
-            (right :: *)
+class NatEq (left :: Type)
+            (right :: Type)
             (result :: Bool)
             | left right -> result
 instance natEqZZ
@@ -52,9 +52,9 @@ instance natEqSS
 data Nil
 data Cons head tail
 
-class ListAppend (left :: *)
-                 (right :: *)
-                 (out :: *)
+class ListAppend (left :: Type)
+                 (right :: Type)
+                 (out :: Type)
                  | left -> right out
 instance listAppendNil
   :: ListAppend Nil r r
@@ -62,9 +62,9 @@ instance listAppendCons
   :: ListAppend tail r o
   => ListAppend (Cons head tail) r (Cons head o)
 
-class ListMap (f :: * -> *)
-              (list :: *)
-              (out :: *)
+class ListMap (f :: Type -> Type)
+              (list :: Type)
+              (out :: Type)
               | list -> f out
 instance listMapNil
   :: ListMap f Nil Nil
@@ -72,8 +72,8 @@ instance listMapCons
   :: ListMap f tail mapFTail
   => ListMap f (Cons head tail) (Cons (f head) mapFTail)
 
-class ListLength (list :: *)
-                 (length :: *)
+class ListLength (list :: Type)
+                 (length :: Type)
                  | list -> length
 instance listLengthNil
   :: ListLength Nil Zero
@@ -82,18 +82,18 @@ instance listLengthCons
   => ListLength (Cons head tail) (Succ length)
 
 class ListConsWhenNot (cond :: Bool)
-                      (head :: *)
-                      (tail :: *)
-                      (result :: *)
+                      (head :: Type)
+                      (tail :: Type)
+                      (result :: Type)
                       | cond -> head tail result
 instance listConsWhenNotYes
   :: ListConsWhenNot True head tail tail
 instance listConsWhenNotNo
   :: ListConsWhenNot False head tail (Cons head tail)
 
-class ListRejectNatEq (list :: *)
-                      (nat :: *)
-                      (result :: *)
+class ListRejectNatEq (list :: Type)
+                      (nat :: Type)
+                      (result :: Type)
                       | list -> nat result
 instance listRejectNatEqNil
   :: ListRejectNatEq Nil nat Nil
@@ -103,8 +103,8 @@ instance listRejectNatEqCons
       ListConsWhenNot isEq head list result)
   => ListRejectNatEq (Cons head tail) nat result
 
-class NatListNub (list :: *)
-                 (result :: *)
+class NatListNub (list :: Type)
+                 (result :: Type)
                  | list -> result
 instance natListNubNil
   :: NatListNub Nil Nil
@@ -121,7 +121,7 @@ data MapLeaf
 data MapTwo l (k :: Symbol) v r
 data MapThree l (lk :: Symbol) lv m (rk :: Symbol) rv r
 
-class IsMap (ctor :: *)
+class IsMap (ctor :: Type)
 instance isMapLeaf
   :: IsMap MapLeaf
 instance isMapTwo
@@ -135,7 +135,7 @@ type EmptyMap = MapLeaf
 type SingletonMap (k :: Symbol) v = MapTwo EmptyMap k v EmptyMap
 
 
-class IsMapEmpty (map :: *)
+class IsMapEmpty (map :: Type)
                  (result :: Bool)
                  | map -> result
 instance isMapEmptyLeaf
@@ -146,8 +146,8 @@ instance isMapEmptyThree
   :: IsMapEmpty (MapThree l lk lv m rk rv r) False
 
 
-class AllHeights_ (map :: *)
-                  (list :: *)
+class AllHeights_ (map :: Type)
+                  (list :: Type)
                   | map -> list
 instance allHeightsLeaf
   :: AllHeights_ MapLeaf (Cons Zero Nil)
@@ -167,7 +167,7 @@ instance allHeightsThree
   => AllHeights_ (MapThree l lk lv m rk rv r) shlmr
 
 
-class IsMapValid (map :: *)
+class IsMapValid (map :: Type)
                  (result :: Bool)
                  | map -> result
 instance isMapValidLeaf
@@ -181,11 +181,11 @@ instance isMapValidLeaf
 
 class MapLookupTwoOrdered_ (ord :: Ordering)
                            (key :: Symbol)
-                           (l :: *)
+                           (l :: Type)
                            (k :: Symbol)
-                           (v :: *)
-                           (r :: *)
-                           (result :: *)
+                           (v :: Type)
+                           (r :: Type)
+                           (result :: Type)
                            | ord -> key l k v r result
 instance mapLookupTwoOrderedEQ
   :: MapLookupTwoOrdered_ EQ key l k v r (Just v)
@@ -199,14 +199,14 @@ instance mapLookupTwoOrderedGT
 class MapLookupThreeOrderedSnd_ (fst :: Ordering)
                                 (snd :: Ordering)
                                 (key :: Symbol)
-                                (l :: *)
+                                (l :: Type)
                                 (lk :: Symbol)
-                                (lv :: *)
-                                (m :: *)
+                                (lv :: Type)
+                                (m :: Type)
                                 (rk :: Symbol)
-                                (rv :: *)
-                                (r :: *)
-                                (result :: *)
+                                (rv :: Type)
+                                (r :: Type)
+                                (result :: Type)
                                 | fst snd -> key l lk lv m rk rv r result
 instance mapLookupThreeOrderedSndEQ
   :: MapLookupThreeOrderedSnd_ fst EQ key l lk lv m rk rv r (Just rv)
@@ -222,14 +222,14 @@ instance mapLookupThreeOrderedSndMid
 
 class MapLookupThreeOrderedFst_ (ord :: Ordering)
                                 (key :: Symbol)
-                                (l :: *)
+                                (l :: Type)
                                 (lk :: Symbol)
-                                (lv :: *)
-                                (m :: *)
+                                (lv :: Type)
+                                (m :: Type)
                                 (rk :: Symbol)
-                                (rv :: *)
-                                (r :: *)
-                                (result :: *)
+                                (rv :: Type)
+                                (r :: Type)
+                                (result :: Type)
                                 | ord -> key l lk lv m rk rv r result
 instance mapLookupThreeOrderedFstEQ
   :: MapLookupThreeOrderedFst_ EQ key l lk lv m rk rv r (Just lv)
@@ -265,10 +265,10 @@ data CtxThreeMiddle l (lk :: Symbol) lv (rk :: Symbol) rv r
 data CtxThreeRight l (lk :: Symbol) lv m (rk :: Symbol) rv
 
 
-class FromZipperCons_ (head :: *)
-                      (ctx :: *)
-                      (map :: *)
-                      (result :: *)
+class FromZipperCons_ (head :: Type)
+                      (ctx :: Type)
+                      (map :: Type)
+                      (result :: Type)
                       | head -> ctx map result
 instance fromZipperConsTwoLeft
   :: FromZipper_ ctx (MapTwo map k1 v1 r) result
@@ -286,9 +286,9 @@ instance fromZipperConsThreeRight
   :: FromZipper_ ctx (MapThree l k1 v1 m k2 v2 map) result
   => FromZipperCons_ (CtxThreeRight l k1 v1 m k2 v2) ctx map result
 
-class FromZipper_ (ctx :: *)
-                  (map :: *)
-                  (result :: *)
+class FromZipper_ (ctx :: Type)
+                  (map :: Type)
+                  (result :: Type)
                   | ctx map -> result
 instance fromZipperNil
   :: FromZipper_ Nil map map
@@ -297,10 +297,10 @@ instance fromZipperCons
   => FromZipper_ (Cons x ctx) map result
 
 
-class MapInsertUpCons_ (frame :: *)
-                       (kickUp :: *)
-                       (ctx :: *)
-                       (map :: *)
+class MapInsertUpCons_ (frame :: Type)
+                       (kickUp :: Type)
+                       (ctx :: Type)
+                       (map :: Type)
                        | frame -> kickUp ctx map
 instance mapInsertUpConsTwoLeft
   :: FromZipper_ ctx (MapThree l k v m k1 v1 r) map
@@ -318,9 +318,9 @@ instance mapInsertUpConsThreeRight
   :: MapInsertUp_ ctx (MapTwo (MapTwo a k1 v1 b) k2 v2 (MapTwo c k v d)) map
   => MapInsertUpCons_ (CtxThreeRight a k1 v1 b k2 v2) (MapTwo c k v d) ctx map
 
-class MapInsertUp_ (ctx :: *)
-                   (kickUp :: *)
-                   (map :: *)
+class MapInsertUp_ (ctx :: Type)
+                   (kickUp :: Type)
+                   (map :: Type)
                    | ctx kickUp -> map
 instance mapInsertUpNil
   :: MapInsertUp_ Nil m m
@@ -330,14 +330,14 @@ instance mapInsertUpCons
 
 
 class MapInsertDownTwo_ (ord :: Ordering)
-                        (ctx :: *)
+                        (ctx :: Type)
                         (k :: Symbol)
-                        (v :: *)
-                        (l :: *)
+                        (v :: Type)
+                        (l :: Type)
                         (k1 :: Symbol)
-                        (v1 :: *)
-                        (r :: *)
-                        (result :: *)
+                        (v1 :: Type)
+                        (r :: Type)
+                        (result :: Type)
                         | ord -> ctx k v l k1 v1 r result
 instance mapInsertDownTwoEQ
   :: FromZipper_ ctx (MapTwo l k v r) result
@@ -351,17 +351,17 @@ instance mapInserteDownTwoGT
 
 class MapInsertDownThreeSnd_ (fst :: Ordering)
                              (snd :: Ordering)
-                             (ctx :: *)
+                             (ctx :: Type)
                              (k :: Symbol)
-                             (v :: *)
-                             (l :: *)
+                             (v :: Type)
+                             (l :: Type)
                              (k1 :: Symbol)
-                             (v1 :: *)
-                             (m :: *)
+                             (v1 :: Type)
+                             (m :: Type)
                              (k2 :: Symbol)
-                             (v2 :: *)
-                             (r :: *)
-                             (result :: *)
+                             (v2 :: Type)
+                             (r :: Type)
+                             (result :: Type)
                              | fst snd -> ctx k v l k1 v1 m k2 v2 r result
 instance mapInsertDownThreeSndEQ
   :: FromZipper_ ctx (MapThree l k1 v1 m k v r) result
@@ -378,17 +378,17 @@ instance mapInsertDownThreeSndGT
 
 
 class MapInsertDownThreeFst_ (ord :: Ordering)
-                             (ctx :: *)
+                             (ctx :: Type)
                              (k :: Symbol)
-                             (v :: *)
-                             (l :: *)
+                             (v :: Type)
+                             (l :: Type)
                              (k1 :: Symbol)
-                             (v1 :: *)
-                             (m :: *)
+                             (v1 :: Type)
+                             (m :: Type)
                              (k2 :: Symbol)
-                             (v2 :: *)
-                             (r :: *)
-                             (result :: *)
+                             (v2 :: Type)
+                             (r :: Type)
+                             (result :: Type)
                              | ord -> ctx k v l k1 v1 m k2 v2 r result
 instance mapInsertDownThreeFstEQ
   :: FromZipper_ ctx (MapThree l k v m k2 v2 r) result
@@ -402,11 +402,11 @@ instance mapInsertDownThreeFstGT
       MapInsertDownThreeSnd_ GT ord ctx k v l k1 v1 m k2 v2 r result)
   => MapInsertDownThreeFst_ GT ctx k v l k1 v1 m k2 v2 r result
 
-class MapInsertDown_ (ctx :: *)
+class MapInsertDown_ (ctx :: Type)
                      (k :: Symbol)
-                     (v :: *)
-                     (map :: *)
-                     (result :: *)
+                     (v :: Type)
+                     (map :: Type)
+                     (result :: Type)
                      | map -> ctx k v map result
 instance mapInsertDownLeaf
   :: MapInsertUp_ ctx (MapTwo MapLeaf k v MapLeaf) result
@@ -422,9 +422,9 @@ instance mapInsertDownThree
 
 
 class MapInsert (key :: Symbol)
-                (value :: *)
-                (map :: *)
-                (result :: *)
+                (value :: Type)
+                (map :: Type)
+                (result :: Type)
                 | map -> key value result
 instance mapInsertDef
   :: MapInsertDown_ Nil key value map result
@@ -432,16 +432,16 @@ instance mapInsertDef
 
 data Field (k :: Symbol) v
 
-class MapInsertField (field :: *)
-                     (map :: *)
-                     (result :: *)
+class MapInsertField (field :: Type)
+                     (map :: Type)
+                     (result :: Type)
                      | field -> map result
 instance mapInsertField
   :: MapInsert key value map result
   => MapInsertField (Field key value) map result
 
-class MapFromList (list :: *)
-                  (map :: *)
+class MapFromList (list :: Type)
+                  (map :: Type)
                   | list -> map
 instance mapFromListNil
   :: MapFromList Nil MapLeaf
@@ -484,8 +484,8 @@ validThreeMap = checkValidMap (Proxy :: Proxy (MapThree MapLeaf "A" A MapLeaf "B
 
 
 checkLookup :: forall map key value.
-  (IsMapValid map True,
-   MapLookup key map value) =>
+  IsMapValid map True =>
+  MapLookup key map value =>
   Proxy map -> SProxy key -> Proxy value
 checkLookup _ _ = Proxy
 
@@ -510,9 +510,9 @@ lookupMultipleB =
 
 
 checkValidInsert :: forall before after key value.
-  (IsMapValid before True,
-   MapInsert key value before after,
-   IsMapValid after True) =>
+  IsMapValid before True =>
+  MapInsert key value before after =>
+  IsMapValid after True =>
   Proxy before -> SProxy key -> Proxy value -> Proxy after
 checkValidInsert _ _ _ = Proxy
 
@@ -523,7 +523,8 @@ validInsert = checkValidInsert (Proxy :: Proxy EmptyMap)
 
 
 checkFromList :: forall list after.
-  (MapFromList list after, IsMapValid after True) =>
+  MapFromList list after =>
+  IsMapValid after True =>
   Proxy list -> Proxy after
 checkFromList _ = Proxy
 

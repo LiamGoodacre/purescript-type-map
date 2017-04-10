@@ -7,13 +7,13 @@
     "output"
   ],
   "dependencies": {
-    "purescript-maybe": "^2.0.1",
-    "purescript-console": "^2.0.0",
-    "purescript-symbols": "^2.0.0",
-    "purescript-proxy": "^1.0.0",
-    "purescript-typelevel-prelude": "^1.0.0"
+    "purescript-maybe": "^3.0.0",
+    "purescript-console": "^3.0.0",
+    "purescript-symbols": "^3.0.0",
+    "purescript-proxy": "^2.0.0",
+    "purescript-typelevel-prelude": "^2.0.0"
   },
   "devDependencies": {
-    "purescript-psci-support": "^2.0.0"
+    "purescript-psci-support": "^3.0.0"
   }
 }
